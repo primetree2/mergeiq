@@ -2,11 +2,9 @@
 
 <br/>
 
-```
-  ⚡ MergeIQ
-```
+# ⚡ MergeIQ
 
-### *Your AI-powered pull request reviewer — built right into GitHub.*
+### *A Chrome extension + GitHub Bot that automatically reviews every pull request using AI — so you always know what changed, what's risky, and whether it's safe to merge.*
 
 <br/>
 
@@ -199,6 +197,32 @@ The MergeIQ icon will appear in your browser toolbar. ⚡
 ## 🤖 GitHub App
 
 The GitHub App mode requires no browser extension. Once installed on a repo, MergeIQ automatically posts a full analysis comment on every new pull request — visible to the whole team, before the repo owner has even opened it.
+
+```
+How the GitHub Bot works:
+
+  Someone opens a PR
+          │
+          ▼
+  GitHub sends a webhook to MergeIQ's server
+          │
+          ▼
+  MergeIQ fetches the full diff via GitHub API
+          │
+          ▼
+  MergeIQ fetches repo context
+  (README · folder structure · dependencies · recent commits)
+          │
+          ▼
+  Everything is sent to Gemini AI with a structured prompt
+          │
+          ▼
+  Gemini returns: verdict · summary · risk flags · questions
+          │
+          ▼
+  MergeIQ posts the analysis as a comment on the PR
+  (visible to the whole team — before anyone has read a single line)
+```
 
 ### Setup
 
