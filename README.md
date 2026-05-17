@@ -1,63 +1,127 @@
-# ⚡ MergeIQ
+<div align="center">
 
-**AI-powered pull request analysis — understand what changed, why it matters, and whether it's safe to merge.**
+<br/>
 
-MergeIQ is a Chrome extension + deployed API that sits alongside GitHub's PR interface. It reads the diff, fetches real repo context, and uses Gemini AI to give you a structured, plain-English analysis of every pull request — in seconds.
+```
+  ⚡ MergeIQ
+```
+
+### *Your AI-powered pull request reviewer — built right into GitHub.*
+
+<br/>
+
+[![Live API](https://img.shields.io/badge/API-Live%20on%20Railway-7ee787?style=for-the-badge&logo=railway&logoColor=white)](https://web-production-6f4dd.up.railway.app)
+[![Chrome Extension](https://img.shields.io/badge/Extension-Chrome%20%2F%20Brave-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](#-getting-started)
+[![GitHub App](https://img.shields.io/badge/GitHub%20App-Auto%20Comments-238636?style=for-the-badge&logo=github&logoColor=white)](#-github-app)
+[![Powered by Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-886FBF?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com)
+
+<br/>
+
+> *You open a pull request. Before you even read the first line of diff,*
+> *MergeIQ has already told you what changed, what risks exist, and whether it's safe to merge.*
+
+<br/>
+
+</div>
 
 ---
 
-## What it does
+## 👋 What is MergeIQ?
 
-When you open a pull request on GitHub and click **Analyze this PR**, MergeIQ:
+MergeIQ is an AI-powered pull request analysis tool that sits alongside GitHub's PR interface. Instead of spending 30 minutes reading through a wall of red and green lines, you get a structured, plain-English summary of every pull request — in seconds.
 
-- Scrapes the diff directly from the GitHub UI
-- Fetches the repo's README, directory tree, dependency manifests, and recent commits via the GitHub API
-- Sends everything to Gemini with a structured prompt
-- Returns a full analysis in a sidebar panel:
+It works in **two ways**:
 
-| Section | What you get |
+| Mode | How it works |
 |---|---|
-| **Verdict** | `SAFE`, `REVIEW NEEDED`, or `RISKY` with confidence level |
-| **Summary** | Plain-English explanation of what the PR actually does |
-| **Key Changes** | File-by-file breakdown of significant modifications |
-| **Risk Flags** | Specific issues flagged with `LOW`, `MEDIUM`, or `HIGH` severity |
-| **Questions to ask** | Suggested questions for the PR author before merging |
+| 🔌 **Chrome Extension** | Click "Analyze this PR" in the MergeIQ sidebar on any GitHub PR page |
+| 🤖 **GitHub App** | Installs on your repo — automatically posts an analysis comment the moment any PR is opened |
+
+Both modes fetch real context about your repository (README, folder structure, dependencies, recent commits) and send it to Gemini AI alongside the diff — so the analysis understands your project, not just the changed lines.
 
 ---
 
-## Demo
+## ✨ What You Get
 
-> Open a GitHub PR → click **Files changed** → click **Analyze this PR**
+Every PR analysis produces a structured report:
 
-The sidebar appears on the right side of any GitHub pull request page automatically.
+```
+⚡ MergeIQ Analysis
+
+✅ SAFE  (Confidence: HIGH)
+   The change is limited to documentation — no functional impact.
+
+📋 Summary
+   This PR updates the README to reflect the new deployment process
+   and adds setup instructions for Windows users.
+
+📁 Key Changes
+   README.md — Added Windows setup section and updated Railway deploy steps.
+
+🚩 Risk Flags
+   ✅ No risk flags detected.
+
+❓ Questions to ask
+   No questions needed — this PR is self-explanatory.
+
+Powered by MergeIQ — AI-powered PR analysis
+```
+
+**Verdict options:** `✅ SAFE` · `⚠️ REVIEW NEEDED` · `🚨 RISKY`
+
+**Risk severities:** `🟢 LOW` · `🟡 MEDIUM` · `🔴 HIGH`
 
 ---
 
-## Tech stack
+## 🏗️ Architecture
 
-| Layer | Technology |
-|---|---|
-| Chrome extension | Manifest V3, vanilla JS |
-| Backend API | Python, FastAPI, Uvicorn |
-| AI model | Google Gemini 2.5 Flash |
-| Repo context | GitHub REST API |
-| Deployment | Railway |
+```
+┌─────────────────────────────────────────────────────────┐
+│                     CLIENT LAYER                         │
+│                                                          │
+│   Chrome Extension          GitHub App (Webhook)         │
+│   • Scrapes PR diff         • Receives PR events         │
+│   • Sidebar UI panel        • No extension needed        │
+└──────────────────────┬──────────────────────────────────┘
+                       │ HTTPS
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│                  BACKEND · FastAPI                        │
+│                                                          │
+│   /analyze endpoint         /webhook endpoint            │
+│   • Diff parser             • Signature verification     │
+│   • GitHub context builder  • Background task runner     │
+│   • Prompt assembler        • PR comment poster          │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│                  LLM · Gemini 2.5 Flash                  │
+│                                                          │
+│   temperature: 0.1 for consistent, reliable outputs      │
+│   Structured JSON response with verdict + confidence     │
+└─────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Project structure
+## 📁 Project Structure
 
 ```
 mergeiq/
-├── analyze.py          # Core LLM prompt logic
-├── main.py             # FastAPI server with /analyze endpoint
-├── github_context.py   # GitHub API fetcher (README, tree, manifests, commits)
-├── requirements.txt    # Python dependencies
-├── Procfile            # Railway deployment config
+│
+├── analyze.py              # Core Gemini prompt logic + JSON parsing
+├── main.py                 # FastAPI server (/analyze + /webhook routes)
+├── github_context.py       # GitHub API: README, tree, manifests, commits
+├── github_app.py           # JWT auth, webhook verification, PR comments
+│
+├── requirements.txt        # Python dependencies
+├── Procfile                # Railway deployment config
+│
 └── extension/
-    ├── manifest.json   # Chrome extension config
-    ├── content.js      # Diff scraper + sidebar injector
-    ├── sidebar.css     # Sidebar styles
+    ├── manifest.json       # Chrome MV3 config
+    ├── content.js          # Diff scraper + sidebar injector
+    ├── sidebar.css         # Sidebar styles
     ├── icon16.png
     ├── icon48.png
     └── icon128.png
@@ -65,7 +129,14 @@ mergeiq/
 
 ---
 
-## Running locally
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+- A [Google AI Studio](https://aistudio.google.com) API key (Gemini)
+- A GitHub Personal Access Token with `repo` scope
+- Chrome or Brave browser
 
 ### 1. Clone the repo
 
@@ -84,13 +155,17 @@ pip install -r requirements.txt
 
 Create a `.env` file in the root directory:
 
-```
-GEMINI_API_KEY=your-google-ai-studio-key
-GITHUB_TOKEN=your-github-personal-access-token
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GITHUB_TOKEN=your_github_personal_access_token_here
+
+# Only needed for the GitHub App feature:
+GITHUB_APP_ID=your_app_id
+GITHUB_WEBHOOK_SECRET=your_webhook_secret
+GITHUB_PRIVATE_KEY=your_pem_file_contents
 ```
 
-- Get a Gemini API key at [aistudio.google.com](https://aistudio.google.com)
-- Create a GitHub token at [github.com/settings/tokens](https://github.com/settings/tokens) with `repo` scope
+> ⚠️ **Never commit `.env` to git.** It's already in `.gitignore`.
 
 ### 4. Start the server
 
@@ -98,32 +173,60 @@ GITHUB_TOKEN=your-github-personal-access-token
 python -m uvicorn main:app --reload
 ```
 
-Server runs at `http://127.0.0.1:8000`. Visit `/docs` for the interactive API explorer.
+Server runs at `http://127.0.0.1:8000` — visit `/docs` for the interactive API explorer.
 
 ### 5. Load the Chrome extension
 
-1. Open `chrome://extensions` in Chrome or Brave
-2. Enable **Developer mode**
+1. Open `chrome://extensions` (or `brave://extensions`)
+2. Enable **Developer mode** (top right toggle)
 3. Click **Load unpacked**
 4. Select the `extension/` folder
 
+The MergeIQ icon will appear in your browser toolbar. ⚡
+
 ---
 
-## API
+## 🔌 Using the Extension
+
+1. Navigate to any GitHub pull request
+2. Click the **Files changed** tab so the diff is visible
+3. The MergeIQ sidebar appears on the right
+4. Click **Analyze this PR**
+5. Watch the 4-step loader as MergeIQ reads the diff, fetches repo context, runs AI analysis, and renders results
+
+---
+
+## 🤖 GitHub App
+
+The GitHub App mode requires no browser extension. Once installed on a repo, MergeIQ automatically posts a full analysis comment on every new pull request — visible to the whole team, before the repo owner has even opened it.
+
+### Setup
+
+1. Go to **github.com → Settings → Developer settings → GitHub Apps → New GitHub App**
+2. Set the Webhook URL to: `https://your-railway-url.up.railway.app/webhook`
+3. Set Repository permissions: **Pull requests → Read & Write**, **Contents → Read only**
+4. Subscribe to **Pull request** events
+5. Generate a private key — save the `.pem` file
+6. Add `GITHUB_APP_ID`, `GITHUB_WEBHOOK_SECRET`, and `GITHUB_PRIVATE_KEY` to Railway environment variables
+7. Install the app on any repo from the **Install App** tab
+
+From that point — every PR gets an automatic MergeIQ analysis comment. No clicks, no extensions, no setup for contributors.
+
+---
+
+## 🌐 API Reference
 
 ### `POST /analyze`
 
-Analyzes a pull request diff with optional repo context.
-
-**Request body:**
+**Request:**
 
 ```json
 {
-  "diff": "string (required) — the raw unified diff",
-  "repo_context": "string (optional) — fallback context if owner/repo not provided",
-  "pr_description": "string (optional) — PR body text from the author",
-  "repo_owner": "string (optional) — GitHub repo owner",
-  "repo_name": "string (optional) — GitHub repo name"
+  "diff": "string (required)",
+  "repo_context": "string (optional)",
+  "pr_description": "string (optional)",
+  "repo_owner": "string (optional)",
+  "repo_name": "string (optional)"
 }
 ```
 
@@ -141,34 +244,78 @@ Analyzes a pull request diff with optional repo context.
 }
 ```
 
+### `POST /webhook`
+
+GitHub App webhook endpoint. Verifies HMAC-SHA256 signature and processes `pull_request` events asynchronously.
+
 ---
 
-## Deployment
+## ☁️ Deployment
 
-The backend is deployed on [Railway](https://railway.app). To deploy your own instance:
+MergeIQ's backend is deployed on [Railway](https://railway.app).
 
 1. Fork this repo
-2. Create a new Railway project → Deploy from GitHub
-3. Add environment variables: `GEMINI_API_KEY` and `GITHUB_TOKEN`
+2. Create a new Railway project → **Deploy from GitHub repo**
+3. Add environment variables in the **Variables** tab
 4. Railway auto-deploys on every push to `main`
-5. Update `API_URL` in `extension/content.js` with your Railway domain
-6. Update `host_permissions` in `extension/manifest.json` with your Railway domain
-7. Reload the extension
+5. Generate a domain in **Settings → Networking**
+6. Update `API_URL` in `extension/content.js` with your Railway domain
+7. Update `host_permissions` in `extension/manifest.json` with your Railway domain
+8. Reload the extension
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
-- [ ] Loading spinner with progress feedback
+- [x] Chrome extension with sidebar UI and loading animation
+- [x] FastAPI backend with `/analyze` endpoint
+- [x] Real repo context fetching via GitHub API
+- [x] Deployed to Railway — live 24/7
+- [x] GitHub App with automatic PR comment posting
+- [x] Advanced prompt engineering for consistent, evidence-based verdicts
 - [ ] Analysis caching (skip re-analyzing unchanged PRs)
-- [ ] GitHub App — auto-post analysis as PR comment
-- [ ] Web dashboard — history of analyzed PRs
 - [ ] Per-repo risk rule configuration
-- [ ] GitLab support
+- [ ] Web dashboard with PR history
 - [ ] Chrome Web Store listing
+- [ ] GitLab support
 
 ---
 
-## License
+## 🛠️ Tech Stack
 
-MIT
+| Layer | Technology |
+|---|---|
+| Chrome Extension | Manifest V3, Vanilla JS |
+| Backend | Python, FastAPI, Uvicorn |
+| AI Model | Google Gemini 2.5 Flash |
+| Repo Context | GitHub REST API |
+| GitHub App Auth | PyJWT + RSA Private Key |
+| Deployment | Railway |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Fork the repo, make your changes, and open a PR targeting `main`.
+
+MergeIQ will automatically analyze your PR. Meta. 😄
+
+---
+
+## 📄 License
+
+MIT — do whatever you want with it.
+
+---
+
+<div align="center">
+
+<br/>
+
+Built with ☕, persistence, and a lot of debugging.
+
+**[⚡ MergeIQ](https://web-production-6f4dd.up.railway.app)** · Made by [primetree2](https://github.com/primetree2)
+
+<br/>
+
+</div>
