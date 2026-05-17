@@ -68,7 +68,7 @@ def analyze(request: AnalyzeRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+        
 # ── WEBHOOK ───────────────────────────────────────────────────────────────────
 
 @app.post("/webhook")
@@ -81,18 +81,27 @@ async def github_webhook(request: Request):
 
     # Verify it's actually from GitHub
     if not verify_webhook_signature(payload_bytes, signature):
+        print("[webhook] Invalid signature — rejecting")
         raise HTTPException(status_code=401, detail="Invalid signature")
 
     event = request.headers.get("X-GitHub-Event", "")
-    payload = await request.json()
 
-    # Only handle PR opened or new commits pushed to a PR
+    # Parse payload once from the raw bytes
+    import json as json_lib
+    try:
+        payload = json_lib.loads(payload_bytes)
+    except Exception:
+        return {"status": "invalid payload"}
+
+    print(f"[webhook] received event: {event}")
+
+    # Only handle pull_request events
     if event != "pull_request":
-        return {"status": "ignored"}
+        return {"status": f"ignored event: {event}"}
 
     action = payload.get("action", "")
     if action not in ("opened", "synchronize", "reopened"):
-        return {"status": "ignored"}
+        return {"status": f"ignored action: {action}"}
 
     # Extract PR details
     pr = payload["pull_request"]
@@ -134,6 +143,7 @@ async def analyze_and_comment(
             }
         )
         diff = diff_response.text
+        print(f"[webhook] diff length: {len(diff)}")
 
         # Fetch repo context
         print(f"[webhook] fetching context for {owner}/{repo}...")
@@ -148,6 +158,7 @@ async def analyze_and_comment(
         )
 
         # Post comment
+        print(f"[webhook] posting comment...")
         success = post_pr_comment(installation_id, owner, repo, pr_number, analysis)
         print(f"[webhook] comment posted: {success}")
 
