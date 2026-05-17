@@ -75,29 +75,29 @@ Powered by MergeIQ — AI-powered PR analysis
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     CLIENT LAYER                         │
-│                                                          │
-│   Chrome Extension          GitHub App (Webhook)         │
-│   • Scrapes PR diff         • Receives PR events         │
-│   • Sidebar UI panel        • No extension needed        │
+│                     CLIENT LAYER                        │
+│                                                         │
+│   Chrome Extension          GitHub App (Webhook)        │
+│   • Scrapes PR diff         • Receives PR events        │
+│   • Sidebar UI panel        • No extension needed       │
 └──────────────────────┬──────────────────────────────────┘
                        │ HTTPS
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│                  BACKEND · FastAPI                        │
-│                                                          │
-│   /analyze endpoint         /webhook endpoint            │
-│   • Diff parser             • Signature verification     │
-│   • GitHub context builder  • Background task runner     │
-│   • Prompt assembler        • PR comment poster          │
+│                  BACKEND · FastAPI                      │
+│                                                         │
+│   /analyze endpoint         /webhook endpoint           │
+│   • Diff parser             • Signature verification    │
+│   • GitHub context builder  • Background task runner    │
+│   • Prompt assembler        • PR comment poster         │
 └──────────────────────┬──────────────────────────────────┘
                        │
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│                  LLM · Gemini 2.5 Flash                  │
-│                                                          │
-│   temperature: 0.1 for consistent, reliable outputs      │
-│   Structured JSON response with verdict + confidence     │
+│                  LLM · Gemini 2.5 Flash                 │
+│                                                         │
+│   temperature: 0.1 for consistent, reliable outputs     │
+│   Structured JSON response with verdict + confidence    │
 └─────────────────────────────────────────────────────────┘
 ```
 
