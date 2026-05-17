@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from analyze import analyze_pr
 from github_context import build_repo_context
+import hmac
+import hashlib
+import asyncio
+from fastapi import Request
+import requests
 
 app = FastAPI(title="MergeIQ API", version="0.2.0")
 
@@ -63,3 +68,89 @@ def analyze(request: AnalyzeRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ── WEBHOOK ───────────────────────────────────────────────────────────────────
+
+@app.post("/webhook")
+async def github_webhook(request: Request):
+    from github_app import verify_webhook_signature, post_pr_comment
+    from github_context import build_repo_context
+
+    payload_bytes = await request.body()
+    signature = request.headers.get("X-Hub-Signature-256", "")
+
+    # Verify it's actually from GitHub
+    if not verify_webhook_signature(payload_bytes, signature):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+
+    event = request.headers.get("X-GitHub-Event", "")
+    payload = await request.json()
+
+    # Only handle PR opened or new commits pushed to a PR
+    if event != "pull_request":
+        return {"status": "ignored"}
+
+    action = payload.get("action", "")
+    if action not in ("opened", "synchronize", "reopened"):
+        return {"status": "ignored"}
+
+    # Extract PR details
+    pr = payload["pull_request"]
+    owner = payload["repository"]["owner"]["login"]
+    repo = payload["repository"]["name"]
+    pr_number = pr["number"]
+    installation_id = payload["installation"]["id"]
+    pr_body = pr.get("body") or ""
+
+    print(f"[webhook] PR #{pr_number} {action} on {owner}/{repo}")
+
+    # Run analysis in background so webhook returns fast
+    asyncio.create_task(
+        analyze_and_comment(owner, repo, pr_number, pr_body, installation_id)
+    )
+
+    return {"status": "processing"}
+
+
+async def analyze_and_comment(
+    owner: str,
+    repo: str,
+    pr_number: int,
+    pr_body: str,
+    installation_id: int
+):
+    from github_app import post_pr_comment, get_installation_token
+    from github_context import build_repo_context
+
+    try:
+        # Fetch diff via GitHub API
+        token = get_installation_token(installation_id)
+        diff_response = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.diff",
+                "X-GitHub-Api-Version": "2022-11-28",
+            }
+        )
+        diff = diff_response.text
+
+        # Fetch repo context
+        print(f"[webhook] fetching context for {owner}/{repo}...")
+        repo_context = build_repo_context(owner, repo)
+
+        # Run analysis
+        print(f"[webhook] running analysis...")
+        analysis = analyze_pr(
+            repo_context=repo_context,
+            diff=diff,
+            pr_description=pr_body
+        )
+
+        # Post comment
+        success = post_pr_comment(installation_id, owner, repo, pr_number, analysis)
+        print(f"[webhook] comment posted: {success}")
+
+    except Exception as e:
+        import traceback
+        print(f"[webhook] ERROR: {traceback.format_exc()}")
