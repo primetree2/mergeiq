@@ -9,7 +9,7 @@
     ],
     "host_permissions": [
         "https://github.com/*",
-        "https://web-production-1dc81.up.railway.app/*"
+        "https://web-production-6f4dd.up.railway.app/*"
     ],
     "icons": {
         "16": "icon16.png",

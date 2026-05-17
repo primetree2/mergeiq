@@ -1,5 +1,5 @@
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
-const API_URL = "https://web-production-1dc81.up.railway.app/analyze";
+const API_URL = "https://web-production-6f4dd.up.railway.app/analyze";
 const SIDEBAR_ID = "mergeiq-sidebar";
 
 // ── SCRAPE DIFF FROM GITHUB PAGE ─────────────────────────────────────────────
