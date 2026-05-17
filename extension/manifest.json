@@ -1,0 +1,41 @@
+{
+    "manifest_version": 3,
+    "name": "MergeIQ",
+    "version": "0.2.0",
+    "description": "AI-powered pull request analysis — understand what changed, why it matters, and whether it's safe to merge.",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://github.com/*",
+        "https://web-production-1dc81.up.railway.app/*"
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "action": {
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        },
+        "default_title": "MergeIQ"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://github.com/*/pull/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "sidebar.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}

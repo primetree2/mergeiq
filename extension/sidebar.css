@@ -1,0 +1,241 @@
+/* ── SIDEBAR CONTAINER ── */
+#mergeiq-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100vh;
+    background: #0d1117;
+    border-left: 1px solid #30363d;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px;
+    color: #e6edf3;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── HEADER ── */
+#mergeiq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #30363d;
+    background: #161b22;
+    flex-shrink: 0;
+}
+
+#mergeiq-logo {
+    font-weight: 700;
+    font-size: 15px;
+    color: #7ee787;
+    letter-spacing: -0.3px;
+}
+
+#mergeiq-close {
+    background: none;
+    border: none;
+    color: #8b949e;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+#mergeiq-close:hover {
+    background: #30363d;
+    color: #e6edf3;
+}
+
+/* ── BODY ── */
+#mergeiq-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #30363d transparent;
+}
+
+/* ── ANALYZE BUTTON ── */
+#mergeiq-analyze-btn {
+    width: 100%;
+    padding: 10px;
+    background: #238636;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 16px;
+}
+
+#mergeiq-analyze-btn:hover {
+    background: #2ea043;
+}
+
+#mergeiq-analyze-btn:disabled {
+    background: #21262d;
+    color: #8b949e;
+    cursor: not-allowed;
+}
+
+/* ── VERDICT ── */
+.mergeiq-verdict {
+    border: 1px solid;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+
+.mergeiq-verdict-label {
+    font-weight: 700;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.mergeiq-confidence {
+    font-size: 10px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.mergeiq-verdict-reason {
+    font-size: 12px;
+    color: #c9d1d9;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── SECTIONS ── */
+.mergeiq-section {
+    margin-bottom: 18px;
+}
+
+.mergeiq-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8b949e;
+    margin-bottom: 8px;
+}
+
+.mergeiq-summary {
+    color: #c9d1d9;
+    line-height: 1.55;
+    margin: 0;
+    font-size: 12px;
+}
+
+/* ── CHANGES ── */
+.mergeiq-change-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #21262d;
+}
+
+.mergeiq-change-item:last-child {
+    border-bottom: none;
+}
+
+.mergeiq-filename {
+    display: inline-block;
+    font-size: 10px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: #7ee787;
+    margin-bottom: 4px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.mergeiq-change-desc {
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.45;
+}
+
+/* ── RISK FLAGS ── */
+.mergeiq-risk-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #21262d;
+}
+
+.mergeiq-risk-item:last-child {
+    border-bottom: none;
+}
+
+.mergeiq-severity {
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    margin-top: 1px;
+}
+
+.mergeiq-risk-type {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e6edf3;
+    margin-bottom: 3px;
+}
+
+.mergeiq-risk-desc {
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.45;
+}
+
+/* ── QUESTIONS ── */
+.mergeiq-question {
+    font-size: 12px;
+    color: #c9d1d9;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+/* ── ERROR ── */
+.mergeiq-error {
+    background: #c4646420;
+    border: 1px solid #c4646440;
+    border-radius: 6px;
+    padding: 12px;
+    color: #c46464;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.mergeiq-all-clear {
+    font-size: 12px;
+    color: #2ea043;
+    background: rgba(46, 160, 67, 0.1);
+    border: 1px solid rgba(46, 160, 67, 0.3);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-weight: 600;
+}
+
+.mergeiq-no-questions {
+    font-size: 12px;
+    color: #8b949e;
+    font-style: italic;
+    padding: 4px 0;
+}
