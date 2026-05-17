@@ -102,6 +102,44 @@ function createSidebar() {
   `;
 
   document.body.appendChild(sidebar);
+  sidebar.innerHTML = `
+    <div id="mergeiq-header">
+      <span id="mergeiq-logo">
+        <svg width="14" height="14" viewBox="0 0 128 128" style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="80,18 54,68 68,68 52,110 98,58 82,58 100,18" fill="#86c464"/>
+        </svg>
+        Merge<span style="color:#86c464">IQ</span>
+      </span>
+      <button id="mergeiq-close">✕</button>
+    </div>
+    <div id="mergeiq-body">
+      <button id="mergeiq-analyze-btn">Analyze this PR</button>
+
+      <div id="mergeiq-loading">
+        <div class="mergeiq-spinner"></div>
+        <div class="mergeiq-loading-steps">
+          <div class="mergeiq-loading-step" id="step-diff">
+            <div class="mergeiq-step-icon">1</div>
+            <span>Reading diff</span>
+          </div>
+          <div class="mergeiq-loading-step" id="step-context">
+            <div class="mergeiq-step-icon">2</div>
+            <span>Fetching repo context</span>
+          </div>
+          <div class="mergeiq-loading-step" id="step-ai">
+            <div class="mergeiq-step-icon">3</div>
+            <span>Analyzing with Gemini</span>
+          </div>
+          <div class="mergeiq-loading-step" id="step-done">
+            <div class="mergeiq-step-icon">4</div>
+            <span>Preparing results</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="mergeiq-result" style="display:none;"></div>
+    </div>
+  `;
 
   document.getElementById("mergeiq-close").addEventListener("click", () => {
     sidebar.remove();
@@ -114,23 +152,44 @@ function createSidebar() {
 async function runAnalysis() {
   const btn = document.getElementById("mergeiq-analyze-btn");
   const resultDiv = document.getElementById("mergeiq-result");
+  const loadingDiv = document.getElementById("mergeiq-loading");
 
+  // Reset UI
   btn.disabled = true;
   btn.textContent = "Analyzing...";
   resultDiv.style.display = "none";
+  loadingDiv.classList.add("visible");
 
+  // Reset steps
+  ["step-diff", "step-context", "step-ai", "step-done"].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove("active", "done");
+  });
+
+  // Step 1 — reading diff
+  setStep("step-diff", "active");
   const diff = scrapeDiff();
   const prInfo = scrapePRInfo();
 
   console.log("[MergeIQ] Scraped diff length:", diff.length);
-  console.log("[MergeIQ] Scraped diff preview:\n", diff.substring(0, 500));
 
   if (!diff || diff.trim().length < 5) {
+    loadingDiv.classList.remove("visible");
     showError("Could not read the diff.\n\nMake sure you are on the 'Files changed' tab and the file is expanded.");
     btn.disabled = false;
     btn.textContent = "Analyze this PR";
     return;
   }
+
+  setStep("step-diff", "done");
+
+  // Step 2 — fetching context (happens server-side, simulate timing)
+  setStep("step-context", "active");
+  await delay(600);
+  setStep("step-context", "done");
+
+  // Step 3 — AI analysis
+  setStep("step-ai", "active");
 
   try {
     const response = await fetch(API_URL, {
@@ -148,13 +207,38 @@ async function runAnalysis() {
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
     const data = await response.json();
+
+    setStep("step-ai", "done");
+
+    // Step 4 — preparing results
+    setStep("step-done", "active");
+    await delay(300);
+    setStep("step-done", "done");
+    await delay(200);
+
+    loadingDiv.classList.remove("visible");
     showResult(data);
+
   } catch (err) {
-    showError("Error: " + err.message + "\n\nMake sure your local server is running.");
+    loadingDiv.classList.remove("visible");
+    showError("Error: " + err.message + "\n\nMake sure the server is running.");
   }
 
   btn.disabled = false;
   btn.textContent = "Re-analyze";
+}
+
+function setStep(id, state) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove("active", "done");
+  if (state) el.classList.add(state);
+  const icon = el.querySelector(".mergeiq-step-icon");
+  if (icon) icon.textContent = state === "done" ? "✓" : el.id.replace("step-", "").replace("diff", "1").replace("context", "2").replace("ai", "3").replace("done", "4");
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // ── RENDER RESULT ─────────────────────────────────────────────────────────────
