@@ -2,7 +2,11 @@
 
 <br/>
 
-# ⚡ MergeIQ
+<div align="center">
+  <img src="extension/icon128.png" width="120" height="120" alt="MergeIQ Logo"/>
+
+  # ⚡ MergeIQ
+</div>
 
 ### *A Chrome extension + GitHub Bot that automatically reviews every pull request using AI — so you always know what changed, what's risky, and whether it's safe to merge.*
 

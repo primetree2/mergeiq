@@ -88,9 +88,7 @@ function createSidebar() {
   sidebar.innerHTML = `
     <div id="mergeiq-header">
       <span id="mergeiq-logo">
-  <svg width="14" height="14" viewBox="0 0 128 128" style="vertical-align:middle;margin-right:6px;" xmlns="http://www.w3.org/2000/svg">
-    <polygon points="80,18 54,68 68,68 52,110 98,58 82,58 100,18" fill="#86c464"/>
-  </svg>
+  <img src="${chrome.runtime.getURL('icon48.png')}" width="22" height="22" style="vertical-align:middle;margin-right:8px;border-radius:6px;"/>
   Merge<span style="color:#86c464">IQ</span>
 </span>
       <button id="mergeiq-close">✕</button>
