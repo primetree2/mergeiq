@@ -88,24 +88,9 @@ function createSidebar() {
   sidebar.innerHTML = `
     <div id="mergeiq-header">
       <span id="mergeiq-logo">
-  <img src="${chrome.runtime.getURL('icon48.png')}" width="22" height="22" style="vertical-align:middle;margin-right:8px;border-radius:6px;"/>
-  Merge<span style="color:#86c464">IQ</span>
-</span>
-      <button id="mergeiq-close">✕</button>
-    </div>
-    <div id="mergeiq-body">
-      <button id="mergeiq-analyze-btn">Analyze this PR</button>
-      <div id="mergeiq-result" style="display:none;"></div>
-    </div>
-  `;
-
-  document.body.appendChild(sidebar);
-  sidebar.innerHTML = `
-    <div id="mergeiq-header">
-      <span id="mergeiq-logo">
-  <img src="${chrome.runtime.getURL('icon48.png')}" width="22" height="22" style="vertical-align:middle;margin-right:8px;border-radius:6px;"/>
-  Merge<span style="color:#86c464">IQ</span>
-</span>
+        <img src="${chrome.runtime.getURL('icon48.png')}" width="22" height="22" style="vertical-align:middle;margin-right:8px;border-radius:6px;"/>
+        Merge<span style="color:#86c464">IQ</span>
+      </span>
       <button id="mergeiq-close">✕</button>
     </div>
     <div id="mergeiq-body">
@@ -136,6 +121,7 @@ function createSidebar() {
       <div id="mergeiq-result" style="display:none;"></div>
     </div>
   `;
+  document.body.appendChild(sidebar);
 
   document.getElementById("mergeiq-close").addEventListener("click", () => {
     sidebar.remove();

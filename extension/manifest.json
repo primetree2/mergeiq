@@ -24,6 +24,19 @@
         },
         "default_title": "MergeIQ"
     },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "icon16.png",
+                "icon48.png",
+                "icon128.png",
+                "icon.svg"
+            ],
+            "matches": [
+                "https://github.com/*"
+            ]
+        }
+    ],
     "content_scripts": [
         {
             "matches": [
