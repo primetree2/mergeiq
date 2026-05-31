@@ -8,6 +8,8 @@ import hashlib
 import asyncio
 from fastapi import Request
 import requests
+from fastapi.responses import HTMLResponse
+
 
 app = FastAPI(title="MergeIQ API", version="0.2.0")
 
@@ -41,6 +43,14 @@ class AnalyzeResponse(BaseModel):
 @app.get("/")
 def root():
     return {"status": "MergeIQ API is running", "version": "0.2.0"}
+
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy():
+    try:
+        with open("privacy.html", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "<h1>MergeIQ Privacy Policy</h1><p>Coming soon.</p>"
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(request: AnalyzeRequest):
